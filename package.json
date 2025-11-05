@@ -1,0 +1,26 @@
+{
+    "name": "fullstack_part4",
+    "version": "1.0.0",
+    "description": "Blog list application",
+    "main": "index.js",
+    "scripts": {
+        "start": "NODE_ENV=production node index.js",
+        "dev": "NODE_ENV=development node --watch index.js",
+        "test": "NODE_ENV=test node --test",
+        "lint": "eslint ."
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.0.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.54.0",
+        "supertest": "^7.1.4"
+    }
+}
