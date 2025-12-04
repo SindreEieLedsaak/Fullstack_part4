@@ -27,7 +27,7 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
     if (!user) {
         return response.status(401).json({ error: 'user not found' })
     }
-    const blog = new Blog({ ...request.body, user: user.id })
+    const blog = new Blog({ ...request.body, user: user })
     const savedBlog = await blog.save()
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()

@@ -8,14 +8,26 @@ const logger = require('../utils/logger')
 
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const userHelper = require('./user_test_helper')
 const blog = require('../models/blog')
 
 describe('when there is initially some blogs saved', () => {
     beforeEach(async () => {
+        await User.deleteMany({})
         await Blog.deleteMany({})
-        for (const blog of helper.initialBlogs) {
+
+        const user = userHelper.initialUsers[0]
+        await api.post('/api/users').send(user)
+
+        const usersAtStart = await userHelper.usersInDb()
+        const userId = usersAtStart[0].id
+
+        const token = await helper.getToken()
+
+        for (const blog of helper.initialBlogs(userId)) {
             await api.post('/api/blogs').send(blog)
-                .set('Authorization', await helper.getToken())
+                .set('Authorization', token)
                 .expect(201)
                 .expect('Content-Type', /application\/json/)
         }
@@ -31,7 +43,8 @@ describe('when there is initially some blogs saved', () => {
     test('all blogs are returned', async () => {
         const response = await api.get('/api/blogs')
 
-        assert.strictEqual(response.body.length, helper.initialBlogs.length)
+        const users = await userHelper.usersInDb()
+        assert.strictEqual(response.body.length, helper.initialBlogs(users[0].id).length)
     })
 
     test('a specific blog is within the returned blogs', async () => {
@@ -82,7 +95,8 @@ describe('when there is initially some blogs saved', () => {
                 .expect('Content-Type', /application\/json/)
 
             const blogsAtEnd = await api.get('/api/blogs')
-            assert.strictEqual(blogsAtEnd.body.length, helper.initialBlogs.length + 1)
+            const users = await userHelper.usersInDb()
+            assert.strictEqual(blogsAtEnd.body.length, helper.initialBlogs(users[0].id).length + 1)
 
             const titles = blogsAtEnd.body.map(b => b.title)
             assert(titles.includes('async/await simplifies making async calls'))
